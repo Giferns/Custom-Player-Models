@@ -1,0 +1,11 @@
+[ru]
+CPM__TOGGLE_ON = ^4* ^1Вы ^4включили ^1отображение моделей
+CPM__TOGGLE_OFF = ^4* ^1Вы ^3выключили ^1отображение моделей
+
+[en]
+CPM__TOGGLE_ON = ^4* ^1You ^4enable ^1custom models
+CPM__TOGGLE_OFF = ^4* ^1You ^3disable ^1custom models
+
+[ua]
+CPM__TOGGLE_ON = ^4* ^1Ви ^4включили ^1выдображення моделей
+CPM__TOGGLE_OFF = ^4* ^1Ви ^3виключили ^1выдображення моделей
