@@ -21,7 +21,7 @@ enum _:access_s {
 new Array:g_Models = Invalid_Array, g_Size;
 
 public plugin_init() {
-	register_plugin("Custom Player Models CFG", "0.2.1", "BlackSignature");
+	register_plugin("Custom Player Models CFG", "0.2.2", "BlackSignature");
 
 	RegisterHookChain(RG_CBasePlayer_GetIntoGame, "CBasePlayer_GetIntoGame_Post", true);
 	RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName, "CBasePlayer_SetClientUserInfoName_Post", true);
@@ -66,6 +66,12 @@ public custom_player_models_init() {
 			continue;
 		}
 
+		custom_player_models_register(data[ACCESS_KEY], model_tt, str_to_num(body_tt), model_ct, str_to_num(body_ct));
+
+		if(data[ACCESS_AUTH][0] == EOS) {
+			continue;
+		}
+
 	#if !defined STEAM_SUPPORT
 		if(data[ACCESS_AUTH][0] == '@') {
 			continue;
@@ -75,8 +81,6 @@ public custom_player_models_init() {
 		if(time[0] && systime >= parse_time(time, "%d.%m.%Y %H:%M")) {
 			continue
 		}
-
-		custom_player_models_register(data[ACCESS_KEY], model_tt, str_to_num(body_tt), model_ct, str_to_num(body_ct));
 
 		ArrayPushArray(g_Models, data);
 	}
