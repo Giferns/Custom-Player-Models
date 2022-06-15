@@ -51,7 +51,7 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-	register_plugin("Custom Player Models API", "0.2.1", "F@nt0M & BlackSignature");
+	register_plugin("Custom Player Models API", "0.2.3", "F@nt0M & BlackSignature");
 
 	new ret, fwd = CreateMultiForward("custom_player_models_init", ET_IGNORE);
 	ExecuteForward(fwd, ret);
@@ -163,16 +163,16 @@ public MsgHookClCorpse() {
 		}
 	}
 
-	new model[CPM_MAX_MODEL_LENGTH], origin[3], angles[3];
+	new model[CPM_MAX_MODEL_LENGTH], origin[3], Float:angles[3];
 	get_msg_arg_string(arg_model, model, charsmax(model));
 
 	origin[0] = get_msg_arg_int(arg_origin_x);
 	origin[1] = get_msg_arg_int(arg_origin_y);
 	origin[2] = get_msg_arg_int(arg_origin_z);
 
-	angles[0] = get_msg_arg_int(arg_angles_x);
-	angles[1] = get_msg_arg_int(arg_angles_y);
-	angles[2] = get_msg_arg_int(arg_angles_z);
+	angles[0] = get_msg_arg_float(arg_angles_x);
+	angles[1] = get_msg_arg_float(arg_angles_y);
+	angles[2] = get_msg_arg_float(arg_angles_z);
 
 	new delay = get_msg_arg_int(arg_delay);
 	new sequence = get_msg_arg_int(arg_sequence);
@@ -199,9 +199,9 @@ public MsgHookClCorpse() {
 		write_long(origin[0]);
 		write_long(origin[1]);
 		write_long(origin[2]);
-		write_coord(angles[0]);
-		write_coord(angles[1]);
-		write_coord(angles[2]);
+		write_coord_f(angles[0]);
+		write_coord_f(angles[1]);
+		write_coord_f(angles[2]);
 		write_long(delay);
 		write_byte(sequence);
 	#if defined SUPPORT_BODY
