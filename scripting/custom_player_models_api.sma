@@ -51,7 +51,7 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-	register_plugin("Custom Player Models API", "0.2.3", "F@nt0M & BlackSignature");
+	register_plugin("Custom Player Models API", "0.2.4", "F@nt0M & BlackSignature");
 
 	new ret, fwd = CreateMultiForward("custom_player_models_init", ET_IGNORE);
 	ExecuteForward(fwd, ret);
@@ -62,7 +62,13 @@ public plugin_init() {
 	if (Models != Invalid_Trie) {
 		RegisterHookChain(RH_SV_WriteFullClientUpdate, "SV_WriteFullClientUpdate_Pre", false);
 		register_forward(FM_AddToFullPack, "AddToFullPack_Post", true);
-		register_message(get_user_msgid("ClCorpse"), "MsgHookClCorpse");
+
+		if(find_plugin_byfile("rt_core.amxx", .ignoreCase = 0) == INVALID_PLUGIN_ID) {
+			register_message(get_user_msgid("ClCorpse"), "MsgHookClCorpse")
+		}
+		else {
+			log_amx("Plugin 'Revive Teammates' detected, ClCorpse message will not be registered!")
+		}
 	}
 }
 
@@ -398,4 +404,36 @@ clearPlayer(const id) {
 	Players[id][PLAYER_HAS_MODEL] = false;
 	Players[id][PLAYER_SEE_MODEL] = true;
 	arrayset(Players[id][PLAYER_MODEL_KEY], 0, CPM_MAX_KEY_LENGTH - 1);
+}
+
+// https://github.com/ufame/ReviveTeammates --->
+
+/**
+* Called after the creation of the corpse is completed
+*
+* @param iEnt    corpse entity index
+* @param id      id of the player whose corpse
+* @param vOrigin  coordinates of the corpse
+*
+*/
+public rt_creating_corpse_end(const iEnt, const id, const vOrigin[3]) {
+	if(!Players[id][PLAYER_HAS_MODEL] || !is_entity(iEnt)) {
+		return;
+	}
+
+	switch (get_member(id, m_iTeam)) {
+		case TEAM_TERRORIST: {
+			engfunc(EngFunc_SetModel, iEnt, Players[id][PLAYER_MODEL][MODEL_TT]);
+		#if defined SUPPORT_BODY
+			set_entvar(iEnt, var_body, Players[id][PLAYER_MODEL][MODEL_BODY_TT]);
+		#endif
+		}
+
+		case TEAM_CT: {
+			engfunc(EngFunc_SetModel, iEnt, Players[id][PLAYER_MODEL][MODEL_CT]);
+		#if defined SUPPORT_BODY
+			set_entvar(iEnt, var_body, Players[id][PLAYER_MODEL][MODEL_BODY_CT]);
+		#endif
+		}
+	}
 }
