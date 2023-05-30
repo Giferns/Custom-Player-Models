@@ -148,8 +148,8 @@ load_player(id, const authid[]) {
 				if(is_user_steam(id)) {
 					break;
 				}
-		#endif
 			}
+		#endif
 			case 'S', 'V': {
 				if(strcmp(authid, data[ACCESS_AUTH], .ignorecase = true) == 0) {
 					break;
