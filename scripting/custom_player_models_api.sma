@@ -51,7 +51,7 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-	register_plugin("Custom Player Models API", "0.2.4", "F@nt0M & BlackSignature");
+	register_plugin("Custom Player Models API", "0.2.5", "F@nt0M & BlackSignature");
 
 	new ret, fwd = CreateMultiForward("custom_player_models_init", ET_IGNORE);
 	ExecuteForward(fwd, ret);
@@ -63,7 +63,7 @@ public plugin_init() {
 		RegisterHookChain(RH_SV_WriteFullClientUpdate, "SV_WriteFullClientUpdate_Pre", false);
 		register_forward(FM_AddToFullPack, "AddToFullPack_Post", true);
 
-		if(find_plugin_byfile("rt_core.amxx", .ignoreCase = 0) == INVALID_PLUGIN_ID) {
+		if(find_plugin_byfile("rt_core.amxx", .ignoreCase = 0) == INVALID_PLUGIN_ID && find_plugin_byfile("revive_teammates.amxx", .ignoreCase = 0) == INVALID_PLUGIN_ID) {
 			register_message(get_user_msgid("ClCorpse"), "MsgHookClCorpse")
 		}
 		else {
