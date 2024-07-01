@@ -48,10 +48,11 @@ public plugin_natives() {
 	register_native("custom_player_models_reset", "NativeReset");
 	register_native("custom_player_models_enable", "NativeEnable");
 	register_native("custom_player_models_is_enable", "NativeIsEnable");
+	register_native("custom_player_models_get_path", "NativeGetPath");
 }
 
 public plugin_precache() {
-	register_plugin("Custom Player Models API", "0.2.5", "F@nt0M & BlackSignature");
+	register_plugin("Custom Player Models API", "0.2.6", "F@nt0M & BlackSignature");
 
 	new ret, fwd = CreateMultiForward("custom_player_models_init", ET_IGNORE);
 	ExecuteForward(fwd, ret);
@@ -279,6 +280,32 @@ public bool:NativeHas(const plugin, const argc) {
 	return true;
 }
 
+public bool:NativeGetPath(const plugin, const argc) {
+	enum { arg_player = 1, arg_path, arg_length };
+	CHECK_NATIVE_ARGS_NUM(argc, arg_length, false)
+
+	new player = get_param(arg_player);
+	CHECK_NATIVE_PLAYER(player, false)
+
+	if (!Players[player][PLAYER_HAS_MODEL]) {
+		return false;
+	}
+
+	switch (get_member(player, m_iTeam)) {
+		case TEAM_TERRORIST: {
+			set_string(arg_path, Players[player][PLAYER_MODEL][MODEL_TT], get_param(arg_length));
+			return true;
+		}
+
+		case TEAM_CT: {
+			set_string(arg_path, Players[player][PLAYER_MODEL][MODEL_CT], get_param(arg_length));
+			return true;
+		}
+	}
+
+	return false;
+}
+
 public bool:NativeSet(const plugin, const argc) {
 	enum { arg_player = 1, arg_key };
 	CHECK_NATIVE_ARGS_NUM(argc, arg_key, false)
@@ -416,7 +443,7 @@ clearPlayer(const id) {
 * @param vOrigin  coordinates of the corpse
 *
 */
-public rt_creating_corpse_end(const iEnt, const id, const vOrigin[3]) {
+/*public rt_creating_corpse_end(const iEnt, const id, const vOrigin[3]) {
 	if(!Players[id][PLAYER_HAS_MODEL] || !is_entity(iEnt)) {
 		return;
 	}
@@ -436,4 +463,4 @@ public rt_creating_corpse_end(const iEnt, const id, const vOrigin[3]) {
 		#endif
 		}
 	}
-}
+}*/

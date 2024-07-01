@@ -17,3 +17,4 @@ native bool:custom_player_models_get_body(const player, const any:team, &body);
 native bool:custom_player_models_reset(const player);
 native bool:custom_player_models_enable(const player, const bool:value);
 native bool:custom_player_models_is_enable(const player);
+native bool:custom_player_models_get_path(const player, path[] = "", length = 0);
