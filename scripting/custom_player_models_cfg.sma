@@ -62,7 +62,7 @@ public custom_player_models_init() {
 			skin_tt, charsmax(skin_tt),
 			model_ct, charsmax(model_ct),
 			body_ct, charsmax(body_ct),
-			skin_ct, charsmax(skit_ct),
+			skin_ct, charsmax(skin_ct),
 			time, charsmax(time)
 		) != 9) {
 			continue;

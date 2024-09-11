@@ -430,7 +430,7 @@ public bool:NativeGetSkin(const plugin, const argc) {
 
 	new iGetFrom = (iTeam == TEAM_TERRORIST) ? MODEL_SKIN_TT : MODEL_SKIN_CT;
 
-	set_param_byref(arg_body, Players[player][PLAYER_MODEL][iGetFrom]);
+	set_param_byref(arg_skin, Players[player][PLAYER_MODEL][iGetFrom]);
 
 	return true;
 }
