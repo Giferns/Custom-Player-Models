@@ -5,6 +5,8 @@
 
 // Support submodels (body). Comment to disable and save some CPU.
 #define SUPPORT_BODY
+// Support skins (skin). Comment to disable and save some CPU.
+#define SUPPORT_SKIN
 
 #define CHECK_NATIVE_ARGS_NUM(%1,%2,%3) \
 	if (%1 < %2) { \
@@ -22,9 +24,11 @@ enum _:model_s {
 	MODEL_INDEX_TT,
 	MODEL_TT[CPM_MAX_MODEL_LENGTH],
 	MODEL_BODY_TT,
+	MODEL_SKIN_TT,
 	MODEL_INDEX_CT,
 	MODEL_CT[CPM_MAX_MODEL_LENGTH],
-	MODEL_BODY_CT
+	MODEL_BODY_CT,
+	MODEL_SKIN_CT
 };
 
 enum _:player_s {
@@ -45,6 +49,8 @@ public plugin_natives() {
 	register_native("custom_player_models_set", "NativeSet");
 	register_native("custom_player_models_set_body", "NativeSetBody");
 	register_native("custom_player_models_get_body", "NativeGetBody");
+	register_native("custom_player_models_set_skin", "NativeSetSkin");
+	register_native("custom_player_models_get_skin", "NativeGetSkin");
 	register_native("custom_player_models_reset", "NativeReset");
 	register_native("custom_player_models_enable", "NativeEnable");
 	register_native("custom_player_models_is_enable", "NativeIsEnable");
@@ -110,12 +116,18 @@ public AddToFullPack_Post(const handle, const e, const ent, const host, const ho
 		#if defined SUPPORT_BODY
 			set_es(handle, ES_Body, Players[ent][PLAYER_MODEL][MODEL_BODY_TT]);
 		#endif
+		#if defined SUPPORT_SKIN
+			set_es(handle, ES_Skin, Players[ent][PLAYER_MODEL][MODEL_SKIN_TT]);
+		#endif
 		}
 
 		case TEAM_CT: {
 			set_es(handle, ES_ModelIndex, Players[ent][PLAYER_MODEL][MODEL_INDEX_CT]);
 		#if defined SUPPORT_BODY
 			set_es(handle, ES_Body, Players[ent][PLAYER_MODEL][MODEL_BODY_CT]);
+		#endif
+		#if defined SUPPORT_SKIN
+			set_es(handle, ES_Skin, Players[ent][PLAYER_MODEL][MODEL_SKIN_CT]);
 		#endif
 		}
 	}
@@ -229,8 +241,8 @@ public MsgHookClCorpse() {
 }
 
 public bool:NativeRegister(const plugin, const argc) {
-	enum { arg_key = 1, arg_model_tt, arg_body_tt, arg_model_ct, arg_body_ct };
-	CHECK_NATIVE_ARGS_NUM(argc, arg_body_ct, false)
+	enum { arg_key = 1, arg_model_tt, arg_body_tt, arg_skin_tt, arg_model_ct, arg_body_ct, arg_skin_ct };
+	CHECK_NATIVE_ARGS_NUM(argc, arg_skin_ct, false)
 
 	new key[CPM_MAX_KEY_LENGTH];
 	get_string(arg_key, key, charsmax(key));
@@ -260,6 +272,8 @@ public bool:NativeRegister(const plugin, const argc) {
 
 	Model[MODEL_BODY_TT] = get_param(arg_body_tt);
 	Model[MODEL_BODY_CT] = get_param(arg_body_ct);
+	Model[MODEL_SKIN_TT] = get_param(arg_skin_tt);
+	Model[MODEL_SKIN_CT] = get_param(arg_skin_ct);
 
 	TrieSetArray(Models, key, Model, sizeof Model);
 	return true;
@@ -374,6 +388,53 @@ public bool:NativeGetBody(const plugin, const argc) {
 	return true;
 }
 
+public bool:NativeSetSkin(const plugin, const argc) {
+	enum { arg_player = 1, arg_team, arg_skin };
+	CHECK_NATIVE_ARGS_NUM(argc, arg_skin, false)
+
+	new player = get_param(arg_player);
+	CHECK_NATIVE_PLAYER(player, false)
+
+	new any:iTeam = get_param(arg_team);
+
+	if( !(TEAM_SPECTATOR > iTeam > TEAM_UNASSIGNED) ) {
+		log_error(AMX_ERR_NATIVE, "Invalid team %d", iTeam);
+		return false;
+	}
+
+	new skin = get_param(arg_skin);
+
+	new iSetTo = (iTeam == TEAM_TERRORIST) ? MODEL_SKIN_TT : MODEL_SKIN_CT;
+
+	Players[player][PLAYER_MODEL][iSetTo] = skin;
+	return true;
+}
+
+public bool:NativeGetSkin(const plugin, const argc) {
+	enum { arg_player = 1, arg_team, arg_skin };
+	CHECK_NATIVE_ARGS_NUM(argc, arg_skin, false)
+
+	new player = get_param(arg_player);
+	CHECK_NATIVE_PLAYER(player, false)
+
+	new any:iTeam = get_param(arg_team);
+
+	if( !(TEAM_SPECTATOR > iTeam > TEAM_UNASSIGNED) ) {
+		log_error(AMX_ERR_NATIVE, "Invalid team %d", iTeam);
+		return false;
+	}
+
+	if(!Players[player][PLAYER_HAS_MODEL]) {
+		return false;
+	}
+
+	new iGetFrom = (iTeam == TEAM_TERRORIST) ? MODEL_SKIN_TT : MODEL_SKIN_CT;
+
+	set_param_byref(arg_body, Players[player][PLAYER_MODEL][iGetFrom]);
+
+	return true;
+}
+
 public bool:NativeReset(const plugin, const argc) {
 	enum { arg_player = 1 };
 	CHECK_NATIVE_ARGS_NUM(argc, arg_player, false)
@@ -432,35 +493,3 @@ clearPlayer(const id) {
 	Players[id][PLAYER_SEE_MODEL] = true;
 	arrayset(Players[id][PLAYER_MODEL_KEY], 0, CPM_MAX_KEY_LENGTH - 1);
 }
-
-// https://github.com/ufame/ReviveTeammates --->
-
-/**
-* Called after the creation of the corpse is completed
-*
-* @param iEnt    corpse entity index
-* @param id      id of the player whose corpse
-* @param vOrigin  coordinates of the corpse
-*
-*/
-/*public rt_creating_corpse_end(const iEnt, const id, const vOrigin[3]) {
-	if(!Players[id][PLAYER_HAS_MODEL] || !is_entity(iEnt)) {
-		return;
-	}
-
-	switch (get_member(id, m_iTeam)) {
-		case TEAM_TERRORIST: {
-			engfunc(EngFunc_SetModel, iEnt, Players[id][PLAYER_MODEL][MODEL_TT]);
-		#if defined SUPPORT_BODY
-			set_entvar(iEnt, var_body, Players[id][PLAYER_MODEL][MODEL_BODY_TT]);
-		#endif
-		}
-
-		case TEAM_CT: {
-			engfunc(EngFunc_SetModel, iEnt, Players[id][PLAYER_MODEL][MODEL_CT]);
-		#if defined SUPPORT_BODY
-			set_entvar(iEnt, var_body, Players[id][PLAYER_MODEL][MODEL_BODY_CT]);
-		#endif
-		}
-	}
-}*/
