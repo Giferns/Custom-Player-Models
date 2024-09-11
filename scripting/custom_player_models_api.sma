@@ -63,7 +63,7 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-	register_plugin("Custom Player Models API", "0.2.6", "F@nt0M & BlackSignature");
+	register_plugin("Custom Player Models API", "0.2.7", "F@nt0M & BlackSignature");
 
 	new ret, fwd = CreateMultiForward("custom_player_models_init", ET_IGNORE);
 	ExecuteForward(fwd, ret);

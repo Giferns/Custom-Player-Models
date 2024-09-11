@@ -21,7 +21,7 @@ enum _:access_s {
 new Array:g_Models = Invalid_Array, g_Size;
 
 public plugin_init() {
-	register_plugin("Custom Player Models CFG", "0.2.2", "BlackSignature");
+	register_plugin("Custom Player Models CFG", "0.2.3", "BlackSignature");
 
 	RegisterHookChain(RG_CBasePlayer_GetIntoGame, "CBasePlayer_GetIntoGame_Post", true);
 	RegisterHookChain(RG_CBasePlayer_SetClientUserInfoName, "CBasePlayer_SetClientUserInfoName_Post", true);
