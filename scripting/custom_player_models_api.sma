@@ -8,6 +8,10 @@
 // Support skins (skin). Comment to disable and save some CPU.
 #define SUPPORT_SKIN
 
+// Autoconfig filename in 'amxmodx/configs/plugins', excluding the .cfg extension.
+// Comment to disable autoconfig.
+#define CONFIG_FILENAME "custom_player_models"
+
 #define CHECK_NATIVE_ARGS_NUM(%1,%2,%3) \
 	if (%1 < %2) { \
 		log_error(AMX_ERR_NATIVE, "Invalid num of arguments %d. Expected %d", %1, %2); \
@@ -42,6 +46,7 @@ new Trie:Models = Invalid_Trie, Model[model_s];
 new Players[MAX_PLAYERS + 1][player_s];
 
 new Receiver;
+new g_iDisableCorpses;
 
 public plugin_natives() {
 	register_native("custom_player_models_register", "NativeRegister");
@@ -77,6 +82,16 @@ public plugin_init() {
 			log_amx("Plugin 'Revive Teammates' detected, ClCorpse message will not be registered!")
 		}
 	}
+
+	RegCvars();
+}
+
+RegCvars() {
+	bind_pcvar_num(create_cvar("cpm_no_corpses", "0", .description = "Set to 1 to disable corpses"), g_iDisableCorpses);
+
+#if defined CONFIG_FILENAME
+	AutoExecConfig(.name = CONFIG_FILENAME);
+#endif
 }
 
 public plugin_end() {
@@ -148,6 +163,10 @@ public MsgHookClCorpse() {
 		arg_team,
 		arg_player,
 	};
+
+	if(g_iDisableCorpses) {
+		return PLUGIN_HANDLED;
+	}
 
 	new player = get_msg_arg_int(arg_player);
 	if (!Players[player][PLAYER_HAS_MODEL]) {
