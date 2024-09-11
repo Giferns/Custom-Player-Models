@@ -44,7 +44,7 @@ public custom_player_models_init() {
 
 	g_Models = ArrayCreate(access_s);
 
-	new line[256], data[access_s], model_tt[64], body_tt[6], model_ct[64], body_ct[6], time[32];
+	new line[256], data[access_s], model_tt[64], body_tt[6], skin_tt[6], model_ct[64], body_ct[6], skin_ct[6], time[32];
 
 	new systime = get_systime();
 
@@ -59,14 +59,16 @@ public custom_player_models_init() {
 			data[ACCESS_KEY], charsmax(data[ACCESS_KEY]),
 			model_tt, charsmax(model_tt),
 			body_tt, charsmax(body_tt),
+			skin_tt, charsmax(skin_tt),
 			model_ct, charsmax(model_ct),
 			body_ct, charsmax(body_ct),
+			skin_ct, charsmax(skit_ct),
 			time, charsmax(time)
-		) != 7) {
+		) != 9) {
 			continue;
 		}
 
-		custom_player_models_register(data[ACCESS_KEY], model_tt, str_to_num(body_tt), model_ct, str_to_num(body_ct));
+		custom_player_models_register(data[ACCESS_KEY], model_tt, str_to_num(body_tt), str_to_num(skin_tt), model_ct, str_to_num(body_ct), str_to_num(skin_ct));
 
 		if(data[ACCESS_AUTH][0] == EOS) {
 			continue;
@@ -150,7 +152,7 @@ load_player(id, const authid[]) {
 				}
 			}
 		#endif
-			case 'S', 'V': {
+			case 'S', 'V', 'B': {
 				if(strcmp(authid, data[ACCESS_AUTH], .ignorecase = true) == 0) {
 					break;
 				}
